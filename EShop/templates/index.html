@@ -25,7 +25,7 @@
 <!-- **********Navbar********** -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">Navbar</a>
+          <a class="navbar-brand" href="#">ShopyFy</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -46,6 +46,9 @@
                   <li><a class="dropdown-item" href="{% url 'Changepassword_page' %}">Change Password</a></li>
                   <li><a class="dropdown-item" href="{% url 'Signout' %}">Sign Out</a></li>
                 </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Cart</a>
               </li>
             </ul>
             <form class="d-flex">
@@ -73,27 +76,44 @@
         </div>
 
         <!-- product -->
-        <div id="products" class="col-lg-9">
-            <div class="row mx-auto">
+        <div id="products" class="col-lg-9 ">
+            <div class="row mx-auto ">
               {% for product in products %}
-              <div class="card ms-3 mb-3 mt-3" style="width: 18rem;">
+              <div class="card ms-3 mb-3 mt-3 " id="{{product.id}}" style="width: 18rem;">
                 <img src="{{product.ProductImage.url}}" class="card-img-top" alt="...">
                 <div class="card-body">
                   <h5 class="card-title">{{product.ProductName}}</h5>
                   <p class="card-text"><h6>₹ {{product.ProductPrice}}</h6></p>
+                  <!-- {{ product | is_in_cart:request.session.cart }} -->
                 </div>
-                <div class="card-footer p-0">
+                <div class="card-footer p-0 no-gutters mb-1">
+
+                  {% if product|is_in_cart:request.session.cart %}
+                  <div class="row no-gutters">
+                    <form action="{% url 'Index_page' %}#{{product.id}}" method="post" class="col-2">
+                      {% csrf_token %}
+                      <input type="text" name="product" value="{{product.id}}" class="d-none">
+                      <input type="text" name="remove" value="True" class="d-none">
+                      <input type="submit" value=" - " class="btn btn-block btn-primary">
+                    </form>
+                    <div class="text-center col"><b>{{ product|cart_quantity:request.session.cart }}</b> in cart</div>
+                    <form action="{% url 'Index_page' %}#{{product.id}}" method="post" class="col-3">
+                      {% csrf_token %}
+                      <input type="text" name="product" value="{{product.id}}" class="d-none">
+                      <input type="submit" value=" + " class="btn btn-block btn-primary">
+                    </form>
+                  </div>
+                  {% else %}
+
+
                   <!-- **********Cart Form********** -->
-                  <form action="{% url 'Index_page' %}" method="post" class="mb-2">
+                  <form action="{% url 'Index_page' %}#{{product.id}}" method="post" class="">
                     {% csrf_token %}
                     <input type="text" name="product" value="{{product.id}}" class="d-none">
-                    <input type="submit" class="float-right btn btn-primary  form-control" value="Add To Cart"></form>
+                    <input type="submit" class="btn btn-primary  form-control" value="Add To Cart">
+                  </form>
 
-                    <div class="row">
-                      <input type="submit" value=" - " class="col-2 btn btn-block btn-secondary">
-                      <div class="text-center col">2 in cart</div>
-                      <input type="submit" value=" + " class="col-2 btn btn-block btn-secondary">
-                    </div>
+                  {% endif %}
 
                 </div>
               </div>
